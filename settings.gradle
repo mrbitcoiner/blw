@@ -1,1 +1,6 @@
-include ':app'
+rootProject.name = 'lnwallet'
+
+//include ('app', 'gradle-android-scala-plugin')
+include ('app')
+
+includeBuild("gradle-android-scala-plugin")

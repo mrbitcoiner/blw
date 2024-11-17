@@ -1,0 +1,61 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven {
+            url snaphotRepositoryUrl
+        }
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:$androidPluginVersion"
+        classpath "jp.leafytree.gradle:gradle-android-scala-plugin:$androidScalaPluginVersion"
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.6'
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+apply plugin: "com.android.application"
+apply plugin: "com.neenbedankt.android-apt"
+apply plugin: "jp.leafytree.android-scala"
+
+android {
+    compileSdkVersion androidPluginCompileSdkVersion
+    buildToolsVersion androidPluginBuildToolsVersion
+
+    defaultConfig {
+        minSdkVersion Integer.decode(androidPluginMinSdkVersion)
+        targetSdkVersion Integer.decode(androidPluginTargetSdkVersion)
+        testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+    }
+
+    dexOptions {
+        incremental androidPluginIncremental.toBoolean()
+        preDexLibraries androidPluginPreDexLibraries.toBoolean()
+        jumboMode androidPluginJumboMode.toBoolean()
+        javaMaxHeapSize "2g"
+    }
+}
+
+apt {
+    arguments {
+        resourcePackageName "jp.leafytree.android.hello"
+        androidManifestFile "src/main/AndroidManifest.xml"
+    }
+}
+
+def AAVersion = "3.3.2"
+
+dependencies {
+    apt "org.androidannotations:androidannotations:$AAVersion"
+    compile "org.androidannotations:androidannotations-api:$AAVersion"
+    compile "org.scala-lang:scala-library:$scalaLibraryVersion"
+    compile "com.android.support:multidex:1.0.1"
+    androidTestCompile "com.android.support:multidex-instrumentation:1.0.1", { exclude module: "multidex" }
+}

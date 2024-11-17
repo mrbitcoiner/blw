@@ -1,0 +1,50 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:2.3.3"
+        classpath "jp.leafytree.gradle:gradle-android-scala-plugin:1.6"
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+apply plugin: "com.android.application"
+apply plugin: "jp.leafytree.android-scala"
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
+
+    defaultConfig {
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+    }
+
+    dexOptions {
+        preDexLibraries false
+        javaMaxHeapSize "2g"
+    }
+
+    productFlavors {
+        dev {
+            minSdkVersion 21 // To reduce compilation time
+        }
+
+        prod {
+            minSdkVersion 8
+        }
+    }
+}
+
+dependencies {
+    compile "org.scala-lang:scala-library:2.11.8"
+    compile "com.android.support:multidex:1.0.1"
+}

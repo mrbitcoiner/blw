@@ -1,0 +1,21 @@
+apply plugin: "com.android.library"
+apply plugin: "jp.leafytree.android-scala"
+
+android {
+    compileSdkVersion androidPluginCompileSdkVersion
+    buildToolsVersion androidPluginBuildToolsVersion
+
+    defaultConfig {
+        minSdkVersion Integer.decode(androidPluginMinSdkVersion)
+        targetSdkVersion Integer.decode(androidPluginTargetSdkVersion)
+        versionCode 1
+        versionName "1.0"
+    }
+
+    dexOptions {
+        incremental androidPluginIncremental.toBoolean()
+        preDexLibraries androidPluginPreDexLibraries.toBoolean()
+        jumboMode androidPluginJumboMode.toBoolean()
+        javaMaxHeapSize "2g"
+    }
+}
