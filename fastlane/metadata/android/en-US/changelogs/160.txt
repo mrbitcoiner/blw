@@ -1,0 +1,1 @@
+* Fix Bitcoinj bug stopping block sync
