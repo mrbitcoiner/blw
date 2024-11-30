@@ -52,7 +52,7 @@ object RatesSaver {
   lazy val subscription =
     // Can later be cancelled if don't want updates
     initDelay(retry(LNParams.olympusWrap.getRates, pickInc, 3 to 4),
-      rates.stamp, 60 * 30 * 1000).subscribe(process, Tools.none)
+      rates.stamp, 60 * 5 * 1000).subscribe(process, Tools.none)
 }
 
 // 2 items of memory to help eliminate possible fee spikes
