@@ -1,0 +1,2 @@
+* Removed default olympus servers
+* Changed rates fetch interval from 30 to 5 minutes
