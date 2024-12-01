@@ -27,7 +27,9 @@
         android:icon="@mipmap/ic_launcher"
         android:fullBackupContent="false"
         android:allowBackup="false"
-        android:label="BLW">
+        android:label="BLW"
+				android:usesCleartextTraffic="true">
+				
 
         <provider
             android:name="android.support.v4.content.FileProvider"
