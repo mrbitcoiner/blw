@@ -70,9 +70,9 @@ abstract class Channel(val isHosted: Boolean) extends StateMachine[ChannelData] 
 
   def isUpdatable(upd: ChannelUpdate) =
     getCommits.flatMap(_.updateOpt) forall { oldUpdate =>
-      val isDifferentShortId = oldUpdate.shortChannelId != upd.shortChannelId
-      val isOldUpdateRefresh = !isDifferentShortId && oldUpdate.timestamp < upd.timestamp
-      isDifferentShortId || isOldUpdateRefresh
+      val isSameShortId = oldUpdate.shortChannelId == upd.shortChannelId
+      val isOldUpdateRefresh = oldUpdate.timestamp < upd.timestamp
+      isSameShortId && isOldUpdateRefresh
     }
 
   def RESOLVE(prevUpds: Traversable[LightningMessage], cs: Commitments) = {
@@ -278,9 +278,10 @@ abstract class NormalChannel extends Channel(isHosted = false) { me =>
 
       // GUARD: due to timestamp filter the first update they send must be for our channel
       case (norm: NormalData, upd: ChannelUpdate, OPEN | SLEEPING) if waitingUpdate && !upd.isHosted =>
-        if (me isUpdatable upd) data = me STORE norm.modify(_.commitments.updateOpt).setTo(upd.some)
-        waitingUpdate = false
-
+				if (me.isUpdatable(upd)) {
+					data = me STORE norm.modify(_.commitments.updateOpt).setTo(upd.some)
+					waitingUpdate = false
+				} 
 
       case (norm: NormalData, addHtlc: UpdateAddHtlc, OPEN) =>
         // Got new incoming HTLC, put it to changes without storing for now
