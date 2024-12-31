@@ -1,0 +1,5 @@
+* Bugfix
+	- Core Lightning send ChannelUpdate messages for other channels, sometimes
+		before the update of our channel, it was being applied to our channel, as
+		consequence, the ShortChannelId changed, and routing stopped working on 
+		this channel.
