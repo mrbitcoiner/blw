@@ -367,7 +367,17 @@ abstract class NormalChannel extends Channel(isHosted = false) { me =>
 
       case (norm: NormalData, CMDFeerate(satPerKw), OPEN) if norm.commitments.localParams.isFunder =>
         val shouldUpdate = LNParams.shouldUpdateFee(satPerKw, norm.commitments.localSpec.feeratePerKw)
-        if (shouldUpdate) norm.commitments sendFee satPerKw foreach { case c1 \ feeUpdateMessage =>
+
+				// A bug was detected where in some cases we receive satPerKw == 25000
+				// resulting in a broken channel state where the peer does not accept
+				// the fee update, but the request is stored in the database and every
+				// time that a connection with the peer happens, we get stuck in a loop
+				// where the update fee request is sent, the peer rejects it and close
+				// the connection
+				val buggySatPerKw: Long = 25000L
+				val notBuggySatPerKw = satPerKw != buggySatPerKw
+
+        if (shouldUpdate && notBuggySatPerKw) norm.commitments sendFee satPerKw foreach { case c1 \ feeUpdateMessage =>
           // We send a fee update if current chan unspendable reserve + commitTx fee can afford it
           // otherwise we fail silently in hope that fee will drop or we will receive a payment
           me UPDATA norm.copy(commitments = c1) SEND feeUpdateMessage
