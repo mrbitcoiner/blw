@@ -59,7 +59,7 @@ class LNStartActivity extends ScanActivity { me =>
 
   def checkTransData =
     app.TransData checkAndMaybeErase {
-      case _: LNUrl => me exitTo MainActivity.wallet
+      case lnurl: LNUrl => me exitTo MainActivity.wallet
       case _: BitcoinURI => me exitTo MainActivity.wallet
       case _: PaymentRequest => me exitTo MainActivity.wallet
       case _: NodeAnnouncement => me goTo classOf[LNStartFundActivity]
@@ -162,6 +162,13 @@ object LNUrl {
     LNUrl(Tools bin2readable request)
   }
 
+	def fromLnAddress(lnaddress: String) = {
+		val Array(identifier, domain) = lnaddress split "@"
+		var lnurl = LNUrl(s"https://$domain/.well-known/lnurlp/$identifier")
+		lnurl.isLnAddress = true
+		lnurl
+	}
+
   def guardResponse(raw: String): String = {
     val validJson = Try(raw.parseJson.asJsObject.fields)
     val hasError = validJson.map(_ apply "reason").map(json2String)
@@ -180,6 +187,7 @@ object LNUrl {
 }
 
 case class LNUrl(request: String) {
+	var isLnAddress: Boolean = false
   val uri = LNUrl.checkHost(request)
   lazy val k1 = Try(uri getQueryParameter "k1")
   lazy val isAuth = Try(uri getQueryParameter "tag" equals "login").getOrElse(false)
@@ -274,7 +282,9 @@ case class PayRequest(callback: String, maxSendable: Long, minSendable: Long, me
   require(minCanSend <= maxSendable, s"Max=$maxSendable while min=$minCanSend")
   val metaDataTextPlain = metaDataTexts.head
 
-  override def checkAgainstParent(lnUrl: LNUrl) = lnUrl.uri.getHost == callbackUri.getHost
+  override def checkAgainstParent(lnUrl: LNUrl) = {
+		if (!lnUrl.isLnAddress) lnUrl.uri.getHost == callbackUri.getHost else true
+	}
   def metaDataHash: ByteVector = Crypto.sha256(ByteVector view metadata.getBytes)
 
   def requestFinal(amount: MilliSatoshi, fromnodes: String = new String) =

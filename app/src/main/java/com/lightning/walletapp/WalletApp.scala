@@ -112,15 +112,18 @@ class WalletApp extends Application { me =>
     private[this] val lnUrl = s"(?im).*?(lnurl)([0-9]{1,}[a-z0-9]+){1}".r.unanchored
     private[this] val lnPayReq = s"(?im).*?($prefixes)([0-9]{1,}[a-z0-9]+){1}".r.unanchored
     private[this] val shortNodeLink = "([a-fA-F0-9]{66})@([a-zA-Z0-9:\\.\\-_]+)".r.unanchored
+    private[this] val lnAddress = s"([a-z0-9\\-_]{1,64}@[a-z0-9\\-_\\.]{1,64}.[a-z0-9\\-_]{2,10})".r.unanchored
     val nodeLink = "([a-fA-F0-9]{66})@([a-zA-Z0-9:\\.\\-_]+):([0-9]+)".r.unanchored
 
     case object DoNotEraseValue
     type Checker = PartialFunction[Any, Any]
-    def checkAndMaybeErase(check: Checker) = check(value) match {
-      // Sometimes we need to forward a value between activity switches
-      case DoNotEraseValue => Tools log "app.TransData.value retained"
-      case _ => value = null
-    }
+    def checkAndMaybeErase(check: Checker) = {
+			check(value) match {
+				// Sometimes we need to forward a value between activity switches
+				case DoNotEraseValue => Tools log "app.TransData.value retained"
+				case _ => value = null
+			}
+		}
 
     def bitcoinUri(bitcoinUriLink: String) = {
       val uri = new BitcoinURI(params, bitcoinUriLink)
@@ -136,7 +139,8 @@ class WalletApp extends Application { me =>
       case nodeLink(key, host, port) => mkNodeAnnouncement(PublicKey(ByteVector fromValidHex key), NodeAddress.fromParts(host, port.toInt), host)
       case shortNodeLink(key, host) => mkNodeAnnouncement(PublicKey(ByteVector fromValidHex key), NodeAddress.fromParts(host, port = 9735), host)
       case lnPayReq(prefix, data) => PaymentRequest.read(s"$prefix$data")
-      case lnUrl(prefix, data) => LNUrl.fromBech32(s"$prefix$data")
+		  case lnUrl(prefix, data) => LNUrl.fromBech32(s"$prefix$data")
+			case lnAddress(addr) => LNUrl.fromLnAddress(addr)
       case _ => toBitcoinUri(rawInputTextToParse)
     }
   }
