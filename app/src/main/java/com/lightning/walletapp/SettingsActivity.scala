@@ -54,7 +54,7 @@ class SettingsActivity extends TimerActivity with HumanTimeDisplay { me =>
   }
 
   override def onOptionsItemSelected(m: MenuItem) = {
-    browse("http://lightning-wallet.com")
+    browse("https://github.com/mrbitcoiner/blw")
     true
   }
 
