@@ -6,7 +6,7 @@ android {
     buildToolsVersion '28.0.3'
 
     defaultConfig {
-        versionName "0.4.12"
+        versionName "0.5.0"
         applicationId "com.lightning.walletapp"
         multiDexEnabled true
         targetSdkVersion 29
