@@ -5,3 +5,4 @@ app/.externalNativeBuild
 **/*.swp
 **/.DS_Store
 *.apk
+tmp
