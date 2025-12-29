@@ -45,7 +45,6 @@ import scodec.DecodeResult
 import android.os.Build
 import java.io.File
 
-
 class WalletApp extends Application { me =>
   Utils.appReference = me
 
@@ -179,7 +178,7 @@ class WalletApp extends Application { me =>
           case _ =>
             val discovery = MultiplexingDiscovery.forServices(params, 0)
             peerGroup.addPeerDiscovery(discovery)
-            peerGroup.setMaxConnections(5)
+            peerGroup.setMaxConnections(10)
         }
       }
 
@@ -247,6 +246,7 @@ object ChannelManager extends Broadcaster {
     def onBlock(blocksLeft: Int) = {
       val firstCall = currentBlocksLeft.isEmpty
       currentBlocksLeft = Some(blocksLeft)
+
 
       // Let channels know immediately, important for hosted ones
       // then also repeat on each next incoming last block to save resouces
